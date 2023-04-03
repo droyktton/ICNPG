@@ -1,0 +1,47 @@
+Allocated GPU(s) with id(s):  0
+Setting CUDA_VISIBLE_DEVICES=0
+Setting NV_GPU=0
+DeviceID: 0
+numero de threads omp =  14
+VERSION CUDA
+libcupti.so not found
+
+Accelerator Kernel Timing data
+/home/koltona/icnpg2020/icnpg/Clases/Clases_openacc/jacobi/paso2/laplace2d_exp.c
+  main  NVIDIA  devicenum=0
+    time(us): 43,469
+    76: data region reached 2 times
+        76: data copyin transfers: 8
+             device time(us): total=21,773 max=2,734 min=2,715 avg=2,721
+        116: data copyout transfers: 5
+             device time(us): total=10,041 max=2,515 min=7 avg=2,008
+    82: compute region reached 1000 times
+        82: kernel launched 1000 times
+            grid: [65535]  block: [128]
+            elapsed time(us): total=1,353,961 max=1,608 min=1,329 avg=1,353
+        82: reduction kernel launched 1000 times
+            grid: [1]  block: [256]
+            elapsed time(us): total=129,094 max=151 min=124 avg=129
+    82: data region reached 2000 times
+        82: data copyin transfers: 1000
+             device time(us): total=4,242 max=16 min=3 avg=4
+        94: data copyout transfers: 1000
+             device time(us): total=7,413 max=36 min=5 avg=7
+    94: compute region reached 1000 times
+        94: kernel launched 1000 times
+            grid: [65535]  block: [128]
+            elapsed time(us): total=784,807 max=895 min=771 avg=784
+Jacobi relaxation Calculation: 4096 x 4096 mesh
+Hello World from thread = 0
+    0, 0.250000
+  100, 0.002397
+  200, 0.001204
+  300, 0.000804
+  400, 0.000603
+  500, 0.000483
+  600, 0.000403
+  700, 0.000345
+  800, 0.000302
+  900, 0.000269
+ total: 2.458450 s
+

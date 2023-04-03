@@ -1,0 +1,160 @@
+#include<fstream>
+#include<iostream>
+#include<ctime>
+#include<thrust/host_vector.h>
+#include<thrust/device_vector.h>
+
+#define L	512
+
+struct mifunctor{
+	int *offsets;
+	int *senial;
+	mifunctor(int * _off, int * _sen):offsets(_off),senial(_sen){};
+	__device__
+	int operator()(int tid)
+	{
+		int x=tid%L;
+		int y=int(tid/L);
+		int xx = (x+offsets[y])%L;		
+		int index = xx + L*y;
+		return senial[index];
+	}
+};
+
+
+__global__ 
+void mikernel(int *offsets, int *senialenc, int *senialdes)
+{
+	int tid = blockIdx.x*blockDim.x + threadIdx.x;
+	int x=tid%L;
+	int y=int(tid/L);
+	int xx = (x+offsets[y])%L;		
+	int index = xx + L*y;
+	senialdes[tid]=senialenc[index];
+}
+
+// lee de pgm y lo guarda en un host_vector
+void leepgm(std::ifstream &finp, thrust::host_vector<int> &hz)
+{
+	// avanzamos sobre el encabezado de pgm
+	std::string nombre;
+	std::string doscincocinco("255");
+	do{
+		std::getline(finp,nombre);
+	}while(nombre.compare(doscincocinco)!=0);
+
+	int value;
+	for(int i=0;i<L*L;i++)
+	{
+		finp >> value;
+		hz[i]=value;
+	}
+}
+
+void escribepgm(std::ofstream &fout, thrust::host_vector<int> &hz)
+{
+	fout << "P2\n512 512\n255\n";
+	for(int j=0;j<L*L;j++)
+	{
+		fout << hz[j] << std::endl;
+	}
+}
+
+int main(int argc, char **argv)
+{
+	std::ifstream finpgm(argv[1]);
+
+	// avanzamos sobre el encabezado de pgm
+	std::string nombre;
+	std::string doscincocinco("255");
+	do{
+		std::getline(finpgm,nombre);
+	}while(nombre.compare(doscincocinco)!=0);
+
+	// cargamos el resto de la imagen
+	int N=L*L;
+	thrust::host_vector<int> h_inp(N);
+	for(int n=0;n<L*L;n++)
+	{
+		int value;
+		finpgm >> value;
+		h_inp[n]=value;
+	}
+
+
+	// una opcion es elegir offsets random
+	std::srand ( unsigned ( std::time(0) ) );
+	thrust::host_vector<int> hoffsets(L);
+	//for(int j=0;j<L;j++) hoffsets[j]=int(L*(std::rand()*1.0/RAND_MAX))%L;
+	//for(int j=0;j<L;j++) hoffsets[j]=j*12345;
+	for(int j=0;j<L;j++) hoffsets[j]=thrust::reduce(h_inp.begin()+j*L,h_inp.begin()+(j+1)*L);
+
+	// vector encriptado
+	thrust::host_vector<int> hz(N);
+	for(int j=0;j<L;j++)
+	{
+		for(int i=0;i<L;i++)
+		{
+			int value = h_inp[i+j*L];
+			int n=(i+hoffsets[j]+L)%L+j*L;
+			hz[n]=value;
+		}		
+	}
+
+
+	// guardamos en un file el vector encriptado
+	char nom[50];
+	sprintf(nom,"%s_encripted.pgm",argv[1]);
+	std::ofstream fout(nom);
+	fout << "P2\n512 512\n255\n";
+	for(int j=0;j<N;j++)
+	{
+		fout << hz[j] << std::endl;
+	}
+	fout.close();
+
+
+	///////////////////////////// solucion
+
+        // parte de template
+	thrust::host_vector<int> h_enc(N); // imagen encriptada en host
+	thrust::host_vector<int> h_des(N); // imagen desencriptada en host
+	std::ifstream fin(nom);		   // archivo de entrada
+	leepgm(fin,h_enc);		   // lectura de imagen encriptada
+
+        // parte de solucion
+	thrust::device_vector<int> enc(h_enc);  // declare un vector de device para guardar imagen encriptada
+	thrust::device_vector<int> des(enc.size(),0); // declare un vector de device para guardar imagen desencriptada
+	thrust::device_vector<int> offsets(L); // declare vector de device de offsets de cada fila
+	int *offsets_raw=thrust::raw_pointer_cast(offsets.data());
+	int *enc_raw=thrust::raw_pointer_cast(enc.data());
+	int *des_raw=thrust::raw_pointer_cast(des.data());
+
+	// poco eficiente
+	for(int j=0;j<L;j++) offsets[j]=thrust::reduce(enc.begin()+j*L,enc.begin()+(j+1)*L); // calcule los offsets de cada fila
+	// mejor es usar un reduce by key...
+
+
+	// con Thrust
+	/*thrust::transform(
+		thrust::make_counting_iterator(0),
+		thrust::make_counting_iterator(N),des.begin(),
+		mifunctor(offsets_raw,enc_raw)
+	);*/
+
+	// con CUDA C
+	mikernel<<<(N+255)/256, 256>>>(offsets_raw, enc_raw, des_raw);
+
+	thrust::copy(des.begin(),des.end(),h_des.begin());
+
+	// parte del template
+	sprintf(nom,"%s_desencripted.pgm",argv[1]);
+	std::ofstream fout2(nom);
+	fout2 << "P2\n512 512\n255\n";
+	for(int j=0;j<N;j++)
+	{
+		fout2 << h_des[j] << std::endl;
+	}
+	
+	return 0;
+}

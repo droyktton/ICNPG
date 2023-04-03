@@ -1,0 +1,72 @@
+/*
+Suma paralela de dos vectores de enteros de 1024 elementos 
+-Usa una grilla de 1 bloque con 1024 threads en cada uno
+-Esta version no acepta argumentos de la linea de comandos...
+
+Conceptos de CUDA a discutir:
+- Alocacion y liberacion de memoria en la CPU-ram vs GPU-ram (memoria global)
+- Copias de host a device y de device a host
+- funciones KERNEL (y de device) y grilla de threads
+- Compilacion con nvcc
+
+
+Preguntas: 
+
+- Que hace este programa? Que pasa en la maquina cuando lo corro? (grafico)
+	Ejemplo de transformacion, vergonzosamente paralela!
+
+- Que significan los punteros a memoria de host y de device?
+	porque los decoramos con "d_"?
+
+- Como hago para sumar vectores mas grandes?
+	Se puede mas grandes que el numero de threads por bloque?
+	Mas grandes que el numero total de threads?
+	Que pasa si son mas grandes que la memoria global de la placa?	
+
+- Como averiguo las propiedades relevantes de la gpu?
+	devicequery del cuda samples 
+	mi propio devicequery al principio de mi programa para ver las de la placa que me toco.
+
+
+- Como modifico el programa para recibir argumentos desde la linea de comandos? 
+
+- funcion KERNEL
+	porque esa grilla? porque no 1024 bloques de un thread?
+	que argumentos puede recibir?
+	a que memoria tengo acceso desde el KERNEL?
+	que vale hacer ahi adentro?
+	que pasa en la CPU mientras se corre el KERNEL? Puedo hacer carrerita?
+	que pasa con los datos en la GPUram despues de correr el KERNEL?
+	que pasa si largo un KERNEL y otro mas a continuacion?
+	necesario alocar tres vectores, no se puede hacer una suma "in-place"?
+		
+- Puedo llamar funciones desde el kernel?
+	__DEVICE__ , hacer funcion de device que sume (TODO)
+	
+
+- Performances? 
+	usar timers (TODO)
+	hacer version CPU usando #ifdef para comparar (TODO)
+	hacer version CPU-multicore 
+	correr con nvprof (mostrar)
+
+- Como modifico el programa para hacer el "saxpy"? (TODO)
+- Como modifico el programa para hacer el multiplicacion de matrices? (indexados + convenientes)
+- Es necesario escribir todo esto para, simplemente, sumar dos vectores? (mostrar version thrust y pycuda)
+- Como hago una version paralela en CPU multicore?
+
+PLAN:
+	Ir linea por linea, planteando preguntas.
+ 
+
+PROFILING:
+
+CPU:
+g++ -pg suma_vectores_cpu.cpp -o a.out
+./a.out
+gprof ./a.out 
+
+GPU:
+nvprof ./a.out
+*/
+

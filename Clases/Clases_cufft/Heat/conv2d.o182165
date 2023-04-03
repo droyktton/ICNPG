@@ -1,0 +1,11 @@
+Allocated GPU(s) with id(s):  1
+Setting CUDA_VISIBLE_DEVICES=1
+Setting NV_GPU=1
+DeviceID: 1
+# Lx: 256
+# Ly: 256
+# Running time (in Euler steps): 50000
+# Data Acquiring Step: 100
+# beta: 1.000000
+# DT for Euler step: 0.050000
+# System size: LX=256 LY=256 . heatFFT execution time (in msecs): 15319.460938 

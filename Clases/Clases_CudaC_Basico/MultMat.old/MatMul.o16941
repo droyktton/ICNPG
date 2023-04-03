@@ -1,0 +1,23 @@
+Allocated GPU(s) with id(s):  1
+Setting CUDA_VISIBLE_DEVICES=1
+Setting NV_GPU=1
+naive GPU
+N= 1024 simple cpu: 5830.700811 ms
+N= 1024 simple_CUDA: 119.494507 ms
+N= 1024 cublas: 9.609656 ms
+N= 1024 cublasXt: 16.408501 ms
+naive GPU
+N= 1024 simple cpu: 5994.238144 ms
+N= 1024 simple_CUDA: 120.051405 ms
+N= 1024 cublas: 8.944217 ms
+N= 1024 cublasXt: 17.234573 ms
+CUBLASXT
+N= 1024 simple cpu: 6008.487598 ms
+N= 1024 simple_CUDA: 120.418066 ms
+N= 1024 cublas: 8.844838 ms
+N= 1024 cublasXt: 16.856788 ms
+CUBLAS
+N= 1024 simple cpu: 5898.856912 ms
+N= 1024 simple_CUDA: 121.507556 ms
+N= 1024 cublas: 9.619431 ms
+N= 1024 cublasXt: 16.620104 ms

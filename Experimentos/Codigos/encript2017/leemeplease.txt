@@ -1,0 +1,30 @@
+** Se le entregara una imagen encriptada cuadrada en formato pgm, de N=L*L pixels, que se puede visualizar facilmente.
+
+La imagen se carga como un vector de host "h_enc", tal que
+
+h_enc[n=i+j*L] = Imagen_encriptada(i,j)
+
+donde "i" es la columna, y "j" la fila del pixel "n".
+
+** La imagen esta encriptada de esta forma (ver dibujito):
+
+Imagen_original(i',j') = Imagen_encriptada(i,j);
+
+donde 
+
+i' = (i + offsets[j] )%L
+j' = j
+
+y donde los "offsets[j]" son la suma de cada fila "j" de todos los valores de sus pixels (columnas):
+
+offsets[j] = Suma_i Imagen_original(i,j)
+
+** Su mision es completar el template desencriptador.cu que desencripta en gpu y escribe la imagen desencriptada "h_des" en formato pgm. 
+Si lo hizo bien, deberia visualizar en el pgm de salida un codigo QR. [si no sabe lo que es: https://es.wikipedia.org/wiki/C%C3%B3digo_QR ].
+
+** Escanee el codigo con su celular si tiene la aplicacion de reader QR o bien cargue la imagen desencriptada online en 
+
+http://lector-codigos-qr.onlinegratis.tv/qr-reader/ 
+
+(o en cualquier otro QR reader online) vaya al link correspondiente, y cuentenos por email, enviando a "docentes_icnpg@googlegroups.com", que ve. 
+Adjunte en el mismo email el archivo .cu con su solucion.

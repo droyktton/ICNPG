@@ -1,0 +1,15 @@
+Allocated GPU(s) with id(s):  0
+Setting CUDA_VISIBLE_DEVICES=0
+Setting NV_GPU=0
+DeviceID: 0
+1024
+GPU time:
+0.002667s
+
+Traceback (most recent call last):
+  File "suma_vectores_gpu_general.py", line 73, in <module>
+    cuda.memcpy_dtoh(c, d_c, np.int64(3))
+Boost.Python.ArgumentError: Python argument types in
+    pycuda._driver.memcpy_dtoh(numpy.ndarray, DeviceAllocation, numpy.int64)
+did not match C++ signature:
+    memcpy_dtoh(pycudaboost::python::api::object dest, unsigned long long src)

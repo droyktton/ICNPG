@@ -1,0 +1,20 @@
+reset
+set palette gray
+set multiplot
+set size 0.5,0.5
+set key
+#saco los labels de los ejes
+unset xtics  
+unset ytics
+#saco la barra de referencia de colores
+unset colorbox
+set origin 0.25,0.50
+plot 'Antonov1.txt' matrix with image
+set origin 0, 0.0
+plot 'output_sec.txt' matrix with image
+set origin 0.50, 0
+plot 'output_par.txt' matrix with image
+unset multiplot
+pause 100
+
+

@@ -1,0 +1,28 @@
+Allocated GPU(s) with id(s):  1
+Setting CUDA_VISIBLE_DEVICES=1
+Setting NV_GPU=1
+DeviceID: 1
+Soy el thread (0,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (1,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (2,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (3,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (4,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (5,0,0) del bloque (2,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (0,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (1,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (2,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (3,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (4,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (5,0,0) del bloque (3,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (0,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (1,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (2,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (3,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (4,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (5,0,0) del bloque (1,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (0,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (1,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (2,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (3,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (4,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]
+Soy el thread (5,0,0) del bloque (0,0,0) [blockDim=(6,1,1),gridDim=(4,1,1)]

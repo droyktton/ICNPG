@@ -1,0 +1,2 @@
+nvcc simpleMathAoS.cu -o simpleAoS
+nvcc simpleMathSoA.cu -o simpleSoA

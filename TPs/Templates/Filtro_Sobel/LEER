@@ -1,0 +1,1 @@
+compilar: nvcc imagen.cu sobel.cu -o sobel

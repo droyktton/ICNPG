@@ -1,0 +1,147 @@
+#include<thrust/transform.h>
+#include<thrust/for_each.h>
+#include<thrust/device_vector.h>
+#include<thrust/host_vector.h>
+#include <thrust/iterator/counting_iterator.h>
+
+#include <iostream>
+#include <fstream>
+#include<cmath>
+
+#include <cstdio>
+
+// CUFFT include http://docs.nvidia.com/cuda/cufft/index.html
+#include <cufft.h>
+
+/* counter-based random numbers */
+// http://www.thesalmons.org/john/random123/releases/1.06/docs/
+#include <Random123/philox.h> // philox headers
+#include <Random123/u01.h>    // to get uniform deviates [0,1]
+typedef r123::Philox2x32 RNG; // particular counter-based RNG
+
+//#define NX 128 
+//#define NY 128 
+#define NRANK 2 
+#define BATCH 1 
+
+//nvcc cufft2dC2R.cu -lcufft -arch=sm_21
+
+struct fill_array
+{
+
+	unsigned long semi;
+	float qmax, qmin;
+	int NX, NY;
+
+   	fill_array(int _NX, int _NY, float _qmin, float _qmax, unsigned long _semi):
+	semi(_semi), qmax(_qmax), qmin(_qmin), NX(_NX), NY(_NY){};
+
+  	__device__
+  	cufftComplex operator()(unsigned int tid)
+  	{
+		//NX*(NY/2+1)
+		int kx=tid%(NY/2+1);
+        	int ky=int(tid*1.0/(NY/2+1));
+		
+  		// keys and counters 
+ 		RNG philox;         
+    		RNG::ctr_type c={{}};
+    		RNG::key_type k={{}};
+    		RNG::ctr_type r;
+
+  		// Garantiza una secuencia random "unica" para cada thread  
+    		k[0]=semi; 
+    		c[1]=kx;
+    		c[0]=ky;	
+
+      		r = philox(c, k); 
+
+		// gaussian random amplitude
+		float u1 = u01_open_closed_32_53(r[0]);
+                float u2 = u01_open_closed_32_53(r[1]);
+                float ampli=sqrtf( -2.0*logf(u1) )*sinf(2.0*M_PI*u2); 
+		//float ampli=u01_closed_closed_32_53(r[1]);
+
+		// uniform random phase
+		float phase=u01_closed_closed_32_53(r[2])*2*M_PI;
+	
+		cufftComplex amp;
+ 		amp.x= ampli*cosf(phase);
+      		amp.y= ampli*sinf(phase);
+		
+		float qx=kx;
+		float qy=(ky<NX/2)?(ky):(ky-NX);
+
+		// filter
+		float modk = sqrtf(qx*qx+qy*qy); 
+		if(modk>qmax || modk<qmin) amp.x=amp.y=0.0;
+    
+		return amp; 
+  	}
+};
+
+//int randomsurface(float qmin, float qmax, thrust::device_vector<cufftReal> &output, int NX, int NY)
+int randomsurface(float qmin, float qmax, thrust::device_ptr<cufftReal> output, int NX, int NY)
+{
+	int Ncomplex=NX*(NY/2+1);
+
+	cufftComplex zero={0,0}; 
+	thrust::device_vector<cufftComplex> input(Ncomplex,zero);
+
+	cufftHandle plan; 
+	int n[NRANK] = {NX, NY}; 
+
+	// fills the complex array
+	thrust::transform(
+		thrust::make_counting_iterator(0),thrust::make_counting_iterator(Ncomplex), 
+		input.begin(),fill_array(NX, NY, qmin, qmax, 0)
+	);
+
+
+	// Create a 2D FFT plan.  
+	if (cufftPlanMany(&plan, NRANK, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2R,BATCH) != CUFFT_SUCCESS)
+    	//if (cufftPlan2d(&plan, NX, NY, CUFFT_C2R) != CUFFT_SUCCESS)
+	{ 
+		fprintf(stderr, "CUFFT Error: Unable to create plan\n"); 
+		return 1;	
+	} 
+
+	if (cufftExecC2R(plan, thrust::raw_pointer_cast(&input[0]), thrust::raw_pointer_cast(&output[0])) != CUFFT_SUCCESS){ 
+		fprintf(stderr, "CUFFT Error: Unable to execute plan\n"); 
+		return 1;	
+	} 
+
+	if (cudaDeviceSynchronize() != cudaSuccess){ 
+		fprintf(stderr, "Cuda error: Failed to synchronize\n"); 
+		return 1; 
+	}	
+
+
+/*	thrust::host_vector<cufftComplex> h_input(input);
+	std::ofstream f_input("input.dat");
+	for(int i=0;i<NX;i++){
+	for(int j=0;j<NY/2+1;j++){
+		f_input << h_input[i*(NY/2+1)+j].x << " ";
+	}
+	f_input << std::endl;
+	}
+*/
+
+	// fills the complex array
+	using namespace thrust::placeholders;
+	thrust::transform(output, output+NX*NY, output,_1/sqrt(NX*NY));
+
+
+	thrust::host_vector<cufftReal> h_output(NX*NY);
+	thrust::copy(output,output+NX*NY, h_output.begin());
+	std::ofstream f_output("output.dat");
+	for(int i=0;i<NX;i++){
+	for(int j=0;j<NY;j++){
+		f_output << h_output[j+i*NY] << " ";
+	}
+	f_output << std::endl;
+	}
+	cufftDestroy(plan); 
+	return 0;
+}
+

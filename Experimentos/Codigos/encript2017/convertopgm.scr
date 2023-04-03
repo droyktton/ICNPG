@@ -1,0 +1,3 @@
+# use esto para convertir e uniformizar las imagenes jpg (cambiar si hay de otro formato)
+convert -gravity center -extent 200x200 $1.png -colorspace gray -compress none -depth 8 $1.pgm
+
