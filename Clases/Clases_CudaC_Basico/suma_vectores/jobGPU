@@ -25,9 +25,14 @@
 #$ -N sumador
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/8.0.61
+#module load cuda/8.0.61
 
-echo DeviceID: $SGE_GPU
+printf "\n\n"
 
 #ejecutar binario con sus respectivos argumentos
-nvprof ./a.out $1
+printf "GPU "
+./sumagpu $1
+
+
+printf "\n\nCPU "
+./sumacpu $1

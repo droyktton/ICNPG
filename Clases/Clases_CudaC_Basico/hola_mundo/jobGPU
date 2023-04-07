@@ -27,7 +27,6 @@
 #$ -N holamundo
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/8.0.61
 
 #ejecutar el o los binarios con sus respectivos argumentos
 ./hello

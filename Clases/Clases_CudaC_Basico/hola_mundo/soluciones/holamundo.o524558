@@ -1,0 +1,4 @@
+Allocated GPU(s) with id(s):  0
+Setting CUDA_VISIBLE_DEVICES=0
+Setting NV_GPU=0
+/opt/gridengine/default/spool/compute-6-2/job_scripts/524558: line 33: 31053 Segmentation fault      (core dumped) ./hello

@@ -8,9 +8,9 @@
 
 __global__ void helloFromGPU()
 {
-    printf("hola mundo desde la GPU!\n");
+    //printf("hola mundo desde la GPU!\n");
+    printf("hola mundo desde la GPU desde hilo %d\n", threadIdx.x);
 }
-
 
 int main(int argc, char **argv)
 {

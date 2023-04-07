@@ -3,7 +3,7 @@ APPS=hello
 all: ${APPS}
 
 %: %.cu
-	nvcc -O2 -o $@ $<
+	nvcc -o $@ $<
 clean:
 	rm -f ${APPS}
 
