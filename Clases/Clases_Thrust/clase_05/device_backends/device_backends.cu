@@ -43,7 +43,7 @@ int main(int argc, char **argv)
 	float mscon = cronocon.tac();
 	float mssin = cronosin.tac();
 
-	printf("minimo entre %d numeros =%f, ms_con=%f, ms_sin=%f\n",N, suma,mscon,mssin);	
+	printf("minimo entre %lld numeros =%f, ms_con=%f, ms_sin=%f\n",N, suma,mscon,mssin);	
 
 	return 0;
 }
