@@ -1,48 +1,27 @@
-#@title version en cupy
+#@title modelo SIR en numba
 
-import cupy as cp
 import numpy as np
+from numba import cuda
+import cupy as cp
 import cupyx
 
-# define the kernel as a string
-SIRkernel = cp.RawKernel(r'''
-  extern "C" 
-  {
-    __global__ 
-    void modeloSIR(float *S, float *I, float *R, float *beta, float g, float dt, int N)
-    {
-      int i = threadIdx.x + blockIdx.x*blockDim.x;
 
-      //printf("i=%d, gamma=%f N=%d",i, gamma, N);
-
-      float newS=0, newI=0, newR=0;
-      float oldS=0, oldI=0, oldR=0;
-
-      oldS=S[i];
-      oldI=I[i];
-      oldR=R[i];
-
-      float b=beta[i];
-
-      if(i<N){
+@cuda.jit
+def SIRkernel(S,I,R,beta,g,dt,N):
+      i = cuda.threadIdx.x + cuda.blockIdx.x*cuda.blockDim.x;
+      if i<N:
+        oldS = S[i]
+        oldI = I[i]
+        oldR = R[i]
+        b=beta[i]
 
         newS = oldS - dt * b * oldS * oldI;
-
         newI = oldI + dt * (b*oldS*oldI - g*oldI);
-
         newR = oldR + dt * (g*oldI);
 
         S[i]=newS;
         I[i]=newI;
         R[i]=newR;
-
-        /*S[i]+=N;
-        I[i]+=dt;
-        R[i]+=g;*/
-      }
-  }
-}''', 'modeloSIR')
-
 
 N = 10 # nro de poblaciones
 g = 0.1  # tasa de recuperacion
@@ -72,7 +51,7 @@ print("beta=",beta, len(beta))
 
 ntot = 5000
 
-f = open("data.csv", "w")
+f = open("data4.csv", "w")
     
 h_I = np.zeros(N, dtype=np.float32)
 #h_I=I.get()
@@ -86,16 +65,11 @@ for p in range(ntot):
     
     #print(h_I[0],h_I[1])
     np.savetxt(f, h_I.reshape(1, -1), delimiter='\t', fmt='%f')
-    #cp.savetxt(f, I.reshape(1, -1), delimiter=' ', newline='\n')
 
     block_size = 256
     grid_size = (N + block_size - 1)//block_size
 
-    #print(block_size,grid_size)
-    #print(gamma, Dt, N)
-
     # Llamar al kernel de actualizacion de S[],I[],R[]
-    SIRkernel((grid_size,), (block_size,), (S, I, R, beta, cp.float32(g), cp.float32(dt), N))
+    SIRkernel[grid_size, block_size](S, I, R, beta, cp.float32(g), cp.float32(dt), N)
 
-    #print(t)
     #cp.cuda.Device().synchronize()
