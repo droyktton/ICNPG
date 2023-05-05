@@ -19,14 +19,13 @@
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
-#$ -q gpushort
+#$ -q gpu
 #$ -l gpu=1
 #$ -l memoria_a_usar=1G
-#$ -N laplace
+#$ -N openacc
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/10.0.130
-module load pgi/2019
+module load nvhpc-21.9
 
 echo DeviceID: $SGE_GPU
 

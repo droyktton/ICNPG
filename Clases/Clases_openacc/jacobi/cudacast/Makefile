@@ -37,6 +37,9 @@ all: $(BIN)
 laplace2d_acc: laplace2d.c
 	$(CC) $(CCFLAGS) $(ACCFLAGS) -o $@ $<
 
+laplace2d_acc_naive: laplace2d_acc_naive.c
+	$(CC) $(CCFLAGS) $(ACCFLAGS) -o $@ $<
+
 laplace2d_acc_multicore: laplace2d.c
 	$(CC) $(CCFLAGS) $(ACCMULTIFLAGS) -o $@ $<
 
@@ -47,4 +50,4 @@ laplace2d: laplace2d.c
 	$(CC) $(CCFLAGS) -o $@ $<
 
 clean:
-	$(RM) $(BIN) laplace2d_omp_gcc laplace2d_acc laplace2d_omp laplace2d laplace2d_acc_multicore
+	$(RM) $(BIN) laplace2d_omp_gcc laplace2d_acc laplace2d_omp laplace2d laplace2d_acc_multicore laplace2d_acc_naive
