@@ -46,12 +46,30 @@ end
 x_range = Array{Float32}(x_d)
 l_range = Array{Float32}(l_d)
 
+
+using DelimitedFiles
+data = hcat(r_range, x_range, l_range)
+# Save the matrix as a two-column file
+writedlm("logis.txt", data, '\t')
+
 # Plot the results
-using Plots
-col = [xi < 0 ? "blue" : "red" for xi in l_range]
-scatter(r_range, x_range, color=col, markersize=1, legend=false, markerstrokecolor=col);
-xlabel!("r")
-ylabel!("x")
+#using Plots
+#col = [xi < 0 ? "blue" : "red" for xi in l_range]
+#scatter(r_range, x_range, color=col, markersize=1, legend=false, markerstrokecolor=col);
+#xlabel!("r")
+#ylabel!("x")
 
 #savefig("myplot.png")
+
+
+
+
+
+
+
+
+
+
+
+
 
