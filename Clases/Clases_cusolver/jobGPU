@@ -27,9 +27,9 @@
 #$ -N cusolver
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/10.1.243
+module load cuda/10.0.130
 
 #ejecutar el o los binarios con sus respectivos argumentos
-./$1
+$1
 
 

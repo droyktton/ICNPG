@@ -26,7 +26,7 @@
 #
 #cargar variables de entorno para encontrar cuda
 
-module load miniconda cuda/9.1.85
+module load miniconda cuda/10.0.130
 source activate tensorflow
 conda activate scikit-cuda
 
