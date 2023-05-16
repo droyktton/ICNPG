@@ -1,8 +1,4 @@
 /*
-=============================================================================================
-A. B. Kolton para ICNPG2013, 30/10/2013
-=============================================================================================
-
 Este programita simplemente transforma Fourier una senial unidimensional, 
 almacenada en CPU, usando fftw y thrust. El "device" es la misma CPU. 
 */
@@ -43,9 +39,9 @@ typedef complex<double> COMPLEX;
 #define T2 N/8
 struct FillSignal
 {
-	__device__ __host__ 
+	__device__ __host__
 	REAL operator()(unsigned tid)
-    	{	
+    	{
 		// ponga aqui su funcion preferida...
 		return A1*2.0*cosf(2*M_PI*tid*T1/(float)N) + A2*2.0*sinf(2*M_PI*tid*T2/(float)N);
     	}
@@ -111,6 +107,6 @@ int main(void) {
 	fftw_cleanup_threads();
 #endif
 	return 0;
-	
+
 }
 
