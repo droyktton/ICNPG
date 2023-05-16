@@ -38,14 +38,14 @@ struct Convolutor
 		int ky=tid%(NY/2+1);
         	int kx=tid/(NY/2+1);
 
-		// se corresponden a estos vectores de onda			
+		// se corresponden a estos vectores de onda
 		float qy=2.0*M_PI*ky/NY;
 		float qx=(2.0*M_PI/NX)*((kx<NX/2)?(kx):(NX-kx));
 
 		cufftReal fac;
 
 		// fac=transformada del operador discretizado
-		#ifdef LAPLACIAN 
+		#ifdef LAPLACIAN
 		fac=-(2.0-2.0*cosf(qx))-(2.0-2.0*cosf(qy)); // FFT del laplaciano discreto
 		#elif defined(FILTER)
 		//construir aqui su filtro en el espacio de Fourier, filtro(qx,qy)
@@ -53,11 +53,11 @@ struct Convolutor
 		#else
 		fac=1.0; // FFT de la identidad
 		#endif
-	
+
 		cufftComplex res;
-		
+
 		// Como FFTinv(FFT)=NX*NY, normalizamos
-		res.x = c.x*fac/(NX*NY); 
+		res.x = c.x*fac/(NX*NY);
 		res.y = c.y*fac/(NX*NY);
 
 		return res;
@@ -75,26 +75,26 @@ struct fill_random_array
   	{
 		int x=tid%(NY);
         	int y=int(tid*1.0/NY);
-		
+
   		// keys and counters 
- 		RNG philox;         
+ 		RNG philox;
     		RNG::ctr_type c={{}};
     		RNG::key_type k={{}};
     		RNG::ctr_type r;
 
   		// Garantiza una secuencia random "unica" para cada thread  
-    		k[0]=semi; 
+    		k[0]=semi;
     		c[1]=x;
-    		c[0]=y;	
+    		c[0]=y;
 
-      		r = philox(c, k); 
+      		r = philox(c, k);
 
 		// gaussian random amplitudes
 		float u1 = u01_open_closed_32_53(r[0]);
                 float u2 = u01_open_closed_32_53(r[1]);
-                float amp=sqrtf( -2.0*logf(u1) )*sinf(2.0*M_PI*u2); 
+                float amp=sqrtf( -2.0*logf(u1) )*sinf(2.0*M_PI*u2);
 
-		return amp; 
+		return amp;
   	}
 };
 
@@ -109,8 +109,8 @@ struct fill_cosine_array
 		cufftReal facx=5.0;
 		cufftReal facy=3.0;
 
-		//return cosf(2.0*M_PI*x*facx/NX)*cosf(2.0*M_PI*y*facy/NY);		
-		return cosf(2.0*M_PI*x*facx/NX + 2.0*M_PI*y*facy/NY);		
+		//return cosf(2.0*M_PI*x*facx/NX)*cosf(2.0*M_PI*y*facy/NY);
+		return cosf(2.0*M_PI*x*facx/NX + 2.0*M_PI*y*facy/NY);
   	}
 };
 
@@ -121,13 +121,13 @@ void llenar_array(thrust::device_vector<float> &d, unsigned long semi)
 	#ifdef RANDOM
 	// llena el array 2d en el device con numeros random
 	thrust::transform(
-		thrust::make_counting_iterator(0),thrust::make_counting_iterator(NX*NY), 
+		thrust::make_counting_iterator(0),thrust::make_counting_iterator(NX*NY),
 		d.begin(),fill_random_array(semi)
 	);
 	#else
 	// llena el array 2d en el device con una funcion bidimensional
 	thrust::transform(
-		thrust::make_counting_iterator(0),thrust::make_counting_iterator(NX*NY), 
+		thrust::make_counting_iterator(0),thrust::make_counting_iterator(NX*NY),
 		d.begin(),fill_cosine_array()
 	);
 	#endif
@@ -157,23 +157,23 @@ int main()
 	thrust::host_vector<float> h_input_check(input);
 
 	// creamos dos planes, uno para la transformada forward, otra para la backward
-	cufftHandle plan, planinverso; 
-	int n[NRANK] = {NX, NY}; 
+	cufftHandle plan, planinverso;
+	int n[NRANK] = {NX, NY};
 
-	// Crea plan 2D FFT-forward.  
+	// Crea plan 2D FFT-forward.
 	if (cufftPlanMany(&plan, NRANK, n, NULL, 1, 0, NULL, 1, 0, CUFFT_R2C,BATCH) != CUFFT_SUCCESS)
-	{ 
-		fprintf(stderr, "CUFFT Error: Unable to create plan r2c\n"); 
-		return 1;	
-	} 
+	{
+		fprintf(stderr, "CUFFT Error: Unable to create plan r2c\n");
+		return 1;
+	}
 	// ejecuta plan-forward
 	if (cufftExecR2C(plan, thrust::raw_pointer_cast(&input[0]), thrust::raw_pointer_cast(&output[0])) != CUFFT_SUCCESS)
-	{ 
-		fprintf(stderr, "CUFFT Error: Unable to execute plan\n"); 
-		return 1;	
-	} 
+	{
+		fprintf(stderr, "CUFFT Error: Unable to execute plan\n");
+		return 1;
+	}
 
-	// multiplica el output=Fourier(input) por la transformada de algun "propagador", 
+	// multiplica el output=Fourier(input) por la transformada de algun "propagador",
 	// "funcion de Green" u "operador" complejo para obtener la transformada de la convolucion
 	thrust::transform(
 		output.begin(),output.end(),
@@ -182,22 +182,22 @@ int main()
 		Convolutor()
 	);
 
-	// Crea plan 2D FFT-backward.  
-	//int m[NRANK] = {NX, NY}; 
+	// Crea plan 2D FFT-backward.
+	//int m[NRANK] = {NX, NY};
 	if (cufftPlanMany(&planinverso, NRANK, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2R,BATCH) != CUFFT_SUCCESS)
-	{ 
-		fprintf(stderr, "CUFFT Error: Unable to create plan c2r\n"); 
-		return 1;	
-	} 
+	{
+		fprintf(stderr, "CUFFT Error: Unable to create plan c2r\n");
+		return 1;
+	}
 
 	// ejecuta plan-backward, para obtener la convolucion en espacio real
-	if (	cufftExecC2R(planinverso, 
-		thrust::raw_pointer_cast(&output[0]), 
+	if (	cufftExecC2R(planinverso,
+		thrust::raw_pointer_cast(&output[0]),
 		thrust::raw_pointer_cast(&input[0])) != CUFFT_SUCCESS	)
-	{ 
-		fprintf(stderr, "CUFFT Error: Unable to execute plan\n"); 
-		return 1;	
-	} 
+	{
+		fprintf(stderr, "CUFFT Error: Unable to execute plan\n");
+		return 1;
+	}
 
 	// copia la convolucion en espacio real invFourier(Fourier(input)Fourier(Operador)) al host
 	thrust::host_vector<float> h_input(input);
@@ -228,8 +228,8 @@ int main()
 			inputout << h_input_check[j+NY*i] << " ";
 			convolout << h_input[j+NY*i] << " ";
 		}
-		convolout << "\n";	
-		inputout << "\n";	
+		convolout << "\n";
+		inputout << "\n";
 	}
 
 	// por ejemplo, en el caso del laplaciano, chequear:
@@ -237,7 +237,7 @@ int main()
 	// Si el input es cos(2*pi*x/64)*cos(y*pi*2/64) con x=0,...,NX e y=0,...,NY
 	// gnuplot> splot "input.dat" matrix w pm3d, cos(2*pi*x/NX)*cos(y*pi*2/NY)
 
-	// El laplaciano de cos(2*pi*x/NX)*cos(y*pi*2/NY) es -[(2*pi/NX)**2+(2*pi/NY)**2]*cos(2*pi*x/NX)*cos(y*pi*2/NY) 
+	// El laplaciano de cos(2*pi*x/NX)*cos(y*pi*2/NY) es -[(2*pi/NX)**2+(2*pi/NY)**2]*cos(2*pi*x/NX)*cos(y*pi*2/NY)
 	// gnuplot> splot "convolution.dat" matrix w pm3d, -((2*pi/NX)**2+(2*pi/NY)**2)*cos(2*pi*x/NX)*cos(y*pi*2/NY)
 	#endif
 
@@ -252,7 +252,7 @@ int main()
 	}
 	sofqout << "\n";
 	}
-	#endif 
+	#endif
 }
 
 
