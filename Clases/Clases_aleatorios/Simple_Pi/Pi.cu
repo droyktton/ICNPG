@@ -12,6 +12,7 @@
 #include <Random123/u01.h>    // to get uniform deviates [0,1]
 typedef r123::Philox2x32 RNG; // particular counter-based RNG
 
+#include "cpu_timer.h"
 
 struct estimate_pi
 {
@@ -24,7 +25,7 @@ struct estimate_pi
   double operator()(unsigned int thread_id)
   {
     // keys and counters 
-    RNG philox; 	
+    RNG philox;
     RNG::ctr_type c={{}};
     RNG::key_type k={{}};
     RNG::ctr_type r;
@@ -97,6 +98,9 @@ int main(int argc, char **argv)
   std::cout << "La semilla global es " << semillaglobal << std::endl;
 
 
+  cpu_timer crono;
+  crono.tic();	
+
   // "thrust::tranform_reduce(), fusiona dos operaciones [best practice]	 	
   // Parte "transform": Pongo 30K tiradores independientes a tirar en paralelo 
   // y a realizar sus estimaciones de pi. El functor estimate_pi() contiene 
@@ -116,6 +120,7 @@ int main(int argc, char **argv)
 
   std::cout << std::setprecision(7);
   std::cout << "\n==\n pi es aproximadamente " << estimate << "\n==\n" << std::endl;
+  std::cout << argv[0] << ": " << crono.tac() << " ms" << std::endl;  
 
   return 0;
 }

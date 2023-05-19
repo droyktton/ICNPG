@@ -25,14 +25,10 @@
 #$ -N Pi-CUDA
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/10.1.243
+module load cuda/10.0.130
 
 echo DeviceID: $SGE_GPU
 
 #ejecutar binario con sus respectivos argumentos
 
-echo "VERSION CUDA"
-time ./Pi_CUDA 1000000 10000 43  
-echo 
-
-
+$1

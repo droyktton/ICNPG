@@ -108,8 +108,8 @@ int main(){
         assert(DT<=0.5);        //We've assumed a small temporal step in the integration scheme
 
         // Choosing less "shared memory", more cache.
-        CUDA_SAFE_CALL(cudaThreadSetCacheConfig(cudaFuncCachePreferL1)); 
-        
+        //CUDA_SAFE_CALL(cudaThreadSetCacheConfig(cudaFuncCachePreferL1)); 
+
 
         // Print header
         printf("# Lx: %i\n", LX);

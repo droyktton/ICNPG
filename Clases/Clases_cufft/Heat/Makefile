@@ -8,7 +8,7 @@ CUDASDK_LIB_PATH        = $(CUDASDK_INSTALL_PATH)/C/lib64
 
 INCLUDES += -I. -I$(CUDA_INSTALL_PATH)/include 
 LIBS                    = -L$(CUDA_LIB_PATH)
-CFLAGS                  = -O3
+CFLAGS                  = #-O3
 LDFLAGS                 = -lrt -lm -lcudart -lcufft
 NVCC_FLAGS              = -O3 --ptxas-options=-v --use_fast_math -ftz=true 
 
