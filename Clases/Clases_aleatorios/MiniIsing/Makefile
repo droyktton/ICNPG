@@ -1,30 +1,30 @@
 APP?=miniising
 
 #THRUSTPATH=.
-THRUSTINC=-I/usr/local/cuda/include -I/share/apps/icnpg/common/thrust-master 
-RANDOM123INC=-I../Random123-1.07/include/
+THRUSTINC= -I/state/partition1/apps/external/compilers/pgi/linux86-64-llvm/2019/cuda/10.0/include
+RANDOM123INC=-I/share/apps/icnpg/common/
 
+CUDA_FLAGS=$(RANDOM123INC)
 OMP_FLAGS=-fopenmp -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_OMP -lgomp $(THRUSTINC) $(RANDOM123INC)
 CPP_FLAGS=-DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CPP $(THRUSTINC) $(RANDOM123INC)
 
-all: ${APP}
 
-${APP}: cuda_${APP} omp_${APP} cpp_${APP}	
+all: cuda_${APP} omp_${APP} cpp_${APP}	
 
 #${APP}: $(APP).cu
 #	nvcc -O2 -o $@ $< -Wno-deprecated-gpu-targets	
 
 cuda_${APP}: $(APP).cu
-	nvcc -O2 -o $@ $< -Wno-deprecated-gpu-targets $(RANDOM123INC)
+	nvcc -O2 -o $@ $< -Wno-deprecated-gpu-targets $(CUDA_FLAGS)
 
 omp_${APP}: $(APP).cu
 	cp $(APP).cu $(APP).cpp
-	g++ -O2 $(APP).cpp $(OMP_FLAGS) -o $@
+	g++ -O2 $(OMP_FLAGS) $(APP).cpp -o $@ 
 	rm $(APP).cpp
 
 cpp_${APP}: $(APP).cu
 	cp $(APP).cu $(APP).cpp
-	g++ -O2 $(APP).cpp $(CPP_FLAGS) -o $@
+	g++ -O2 $(CPP_FLAGS)  $(APP).cpp -o $@
 	rm $(APP).cpp
 
 clean:

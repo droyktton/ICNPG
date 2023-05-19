@@ -25,16 +25,24 @@
 #$ -N IsingCUDA
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/8.0.61
+
 
 echo DeviceID: $SGE_GPU
 
 #ejecutar binario con sus respectivos argumentos
 
 
-##Uso: ./MiniIsingCUDA [-l L] [-r niter] [-T temp] [-s semilla] [-w snap]
+##Uso: ./ejecutable [-l L] [-r niter] [-T temp] [-s semilla] [-w snap]
 
 echo "VERSION CUDA"
 ./cuda_miniising -l 512 -r 10000 -T 1.0 -s 123456 -w 1000000000
 echo 
+
+#echo "VERSION CPP"
+#./cpp_miniising -l 512 -r 10000 -T 1.0 -s 123456 -w 1000000000
+#echo 
+
+#echo "VERSION OMP"
+#./omp_miniising -l 512 -r 10000 -T 1.0 -s 123456 -w 1000000000
+#echo 
 

@@ -243,7 +243,11 @@ int main(int argc, char **argv)
 		}
 	}
 
+	std::cout << "ejecutable = " << argv[0] << std::endl;
 	std::cout << "ms = " << crono.tac() << std::endl;
+
+
+	logout << "ejecutable = " << argv[0] << std::endl;
 	logout << "ms = " << crono.tac() << std::endl;
 
 

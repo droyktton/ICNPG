@@ -19,36 +19,16 @@
 #$ -cwd
 #$ -j y
 #$ -S /bin/bash
-#$ -q cpuINgpu
+#$ -q gpushort
 #$ -l gpu=1
 #$ -l memoria_a_usar=1G
-#$ -N IsingOMP
+#$ -N Pi-CUDA
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/10.1.243
+module load cuda/10.0.130
 
 echo DeviceID: $SGE_GPU
 
-## Pido N slots en una misma maquina, pruebe cambiar el numero...
-#$ -pe neworte 14
-
-## Limito los threads a cantidad de slots pedidos (podria largar mas threads...)
-export OMP_NUM_THREADS=14
-
-## para controlar nomas el numero de threads que la version omp va a usar
-echo "numero de threads omp = " $OMP_NUM_THREADS
-
 #ejecutar binario con sus respectivos argumentos
 
-
-##Uso: ./MiniIsingCUDA [-l L] [-r niter] [-T temp] [-s semilla] [-w snap]
-
-echo "VERSION OMP"
-./omp_miniising -l 512 -r 10000 -T 1.0 -s 123456 -w 100000000
-echo 
-
-echo "VERSION CPP"
-./cpp_miniising -l 512 -r 10000 -T 1.0 -s 123456 -w 100000000
-echo 
-
-
+$1
