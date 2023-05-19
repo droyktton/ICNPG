@@ -1,5 +1,0 @@
-Allocated GPU(s) with id(s):  0
-Setting CUDA_VISIBLE_DEVICES=0
-Setting NV_GPU=0
-==5856== NVPROF is profiling process 5856, command: ./a.out
-==5856== Generated result file: /home/koltona/ICNPG/icnpg2023/ICNPG/Clases/Clases_streams/ejecutable.prof
