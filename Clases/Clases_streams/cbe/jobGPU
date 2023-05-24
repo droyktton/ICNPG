@@ -26,9 +26,11 @@
 #
 
 #cargar variables de entorno para encontrar cuda
-module load cuda/10.0.130
+#module load cuda/10.0.130
+module load cuda/11.4.0
 
 #ejecutar el o los binarios con sus respectivos argumentos
 #./ejecutable
 
-nvprof -f -o ejecutable.prof ./a.out
+#nvprof -f -o ejecutable.prof ./a.out
+nsys profile -t nvtx,cuda -o profile --stats=true --force-overwrite true ./a.out
