@@ -2,8 +2,10 @@ APPS=multmat
 
 all: ${APPS}
 
+INCLUDES= -I/share/apps/icnpg/common
+
 %: %.cu
-	nvcc -O2 -lcublas -DCUBLASXt -DCUBLAS -DSIMPLECPU -DSIMPLECUDA -o $@ $<
+	nvcc -O2 -lcublas -DCUBLASXt -DCUBLAS -DSIMPLECPU -DSIMPLECUDA ${INCLUDES} -o $@ $<
 
 clean:
 	rm -f ${APPS} *.dat
