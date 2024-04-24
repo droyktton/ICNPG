@@ -6,10 +6,14 @@
 
 
 /* Size of the input data */
-#define N 8388608  
+#ifndef N
+#define N 8388608
+#endif
 /* Size of the filter */
-#define M 64
 
+#ifndef M
+#define M 64
+#endif
 
 /* Floating point type */
 typedef float FLOAT;
@@ -36,7 +40,7 @@ void conv_sec(FLOAT* input, FLOAT* output, FLOAT * filter)
 
 // kernel
 __global__ void conv_par(FLOAT* input, FLOAT* output, FLOAT* filter) 
-{	  	
+{
 	//TODO: completar el kernel de convolucion
 }
 
@@ -47,7 +51,7 @@ int main(int argc, char *argv[])
 {
     cudaDeviceProp deviceProp;
     int dev; cudaGetDevice(&dev);
-    
+
     cudaGetDeviceProperties(&deviceProp, dev);
     printf("\nDevice %d: \"%s\"\n", dev, deviceProp.name);
 
@@ -72,8 +76,12 @@ int main(int argc, char *argv[])
 
 	/* Allocate memory on device */
 	FLOAT *d_input, *d_output, *d_filter;
-	//TODO: Alocar memoria en device	
-	
+	//TODO: Alocar memoria en device
+
+
+	gpu_timer crono_gpu2;
+	crono_gpu2.tic();
+
 	/* Copy input array to device */
 	//TODO: copiar d_input <- h_input
 
@@ -87,22 +95,25 @@ int main(int argc, char *argv[])
 	crono_cpu.tac();
 
 	// TODO: armar una grilla adecuada	
-	//dim3 block_size(...);
-  	//dim3 grid_size(...);
 
 	// TODO: lanzar el kernel 
 	/* distintos kernels */
 	gpu_timer crono_gpu;
 	crono_gpu.tic();
-	//conv_par<<<....>>>(d_input, d_output, d_filter);
-	cudaDeviceSynchronize();
+	//conv_par<<<...,...>>>(d_input, d_output, d_filter);
+	//cudaDeviceSynchronize();
 	crono_gpu.tac();
-	
+
 	printf("[M/N/ms_cpu/ms_gpu]= %d %d %lf  %lf  \n", M, N, crono_cpu.ms_elapsed, crono_gpu.ms_elapsed);
 
 	/* Copy output array to host */
-	//TODO: completar h_output <- d_output	
-	
+	//TODO: completar h_output <- d_output
+	cudaMemcpy(h_output,d_output,N*sizeof(FLOAT),cudaMemcpyDeviceToHost);
+
+	crono_gpu2.tac();
+	printf("[M/N/ms_cpu/ms_gpu2]= %d %d %lf  %lf  \n", M, N, crono_cpu.ms_elapsed, crono_gpu2.ms_elapsed);
+
+
 	/* comparacion */
 	//TODO completar
 	FLOAT error, maxerror;
@@ -123,6 +134,7 @@ int main(int argc, char *argv[])
 
 	/* Free memory on device */
 	// TODO: liberar memoria device
-	// ...	
+
+	return 0;
 }
 
