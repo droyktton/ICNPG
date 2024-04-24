@@ -27,9 +27,9 @@
 #$ -N convolucion
 #
 #cargar variables de entorno para encontrar cuda
-#module load cuda/10.0.130
+module load cuda/10.0.130
 
 #ejecutar el o los binarios con sus respectivos argumentos
-./convolucion
+nvprof ./convolucion_solucion
 
 

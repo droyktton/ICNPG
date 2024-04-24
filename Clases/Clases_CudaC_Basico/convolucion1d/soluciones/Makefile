@@ -1,4 +1,4 @@
-APPS=convolucion
+APPS=convolucion_solucion
 
 all: ${APPS}
 

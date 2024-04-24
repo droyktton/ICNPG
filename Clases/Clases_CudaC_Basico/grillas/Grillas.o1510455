@@ -1,0 +1,21 @@
+Allocated GPU(s) with id(s):  0
+Setting CUDA_VISIBLE_DEVICES=0
+Setting NV_GPU=0
+ModuleCmd_Load.c(213):ERROR:105: Unable to locate a modulefile for 'cuda/8.0.61'
+uso: ./grillas ntbx ntby ntbz nbgx nbgy nbgz
+ejemplo 1: Quiensoy<<< 3, 2>>> == Quiensoy<<< dim3(3,1,1), dim3(2,1,1)>>>
+Soy el thread (0,0,0) del bloque (2,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+Soy el thread (1,0,0) del bloque (2,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+Soy el thread (0,0,0) del bloque (1,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+Soy el thread (1,0,0) del bloque (1,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+Soy el thread (0,0,0) del bloque (0,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+Soy el thread (1,0,0) del bloque (0,0,0) [blockDim=(2,1,1),gridDim=(3,1,1)] 
+ejemplo 2: Quiensoy<<< dim3(2,2), dim3(2,1) >>>();
+Soy el thread (0,0,0) del bloque (0,1,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (1,0,0) del bloque (0,1,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (0,0,0) del bloque (1,0,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (1,0,0) del bloque (1,0,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (0,0,0) del bloque (0,0,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (1,0,0) del bloque (0,0,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (0,0,0) del bloque (1,1,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
+Soy el thread (1,0,0) del bloque (1,1,0) [blockDim=(2,1,1),gridDim=(2,2,1)] 
