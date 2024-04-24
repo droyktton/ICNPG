@@ -6,10 +6,14 @@
 
 
 /* Size of the input data */
-#define N 8388608  
-/* Size of the filter */
-#define M 64
+#ifndef N
+#define N 8388608
+#endif
 
+/* Size of the filter */
+#ifndef M
+#define M 64
+#endif
 
 /* Floating point type */
 typedef float FLOAT;
@@ -39,7 +43,7 @@ void conv_sec(FLOAT* input, FLOAT* output, FLOAT * filter)
 // todo en memoria global
 // lanzamiento: la grilla se puede elegir independiente de N
 __global__ void conv_par(FLOAT* input, FLOAT* output, FLOAT* filter) 
-{	  	
+{
 	  int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 	  FLOAT temp;
@@ -48,7 +52,7 @@ __global__ void conv_par(FLOAT* input, FLOAT* output, FLOAT* filter)
 	  	temp=0.0;
 	  	for(int i=0;i<M;i++){
 	  		temp += filter[i]*input[i+j];
-		}	  
+		}
 	 	output[j]=temp;
 		j+=gridDim.x*blockDim.x;
 	  }
@@ -89,26 +93,32 @@ int main(int argc, char *argv[])
 		h_input[i] = h_input[i-N];
 
 
+	//////////////////////////////////
+	/* check in the CPU */
+	cpu_timer crono_cpu; 
+	crono_cpu.tic();
+	conv_sec(h_input, check_output, h_filter);
+	crono_cpu.tac();
+	////////////////////////////////////
+
+
 	/* Allocate memory on device */
 	FLOAT *d_input, *d_output, *d_filter;
 	cudaMalloc((void**)&d_input, (N+M) * sizeof(FLOAT));
 	cudaMalloc((void**)&d_output, N * sizeof(FLOAT));
 	cudaMalloc((void**)&d_filter, M * sizeof(FLOAT));
-	
-	
+		
+
+	//////////////////////////////////
+	gpu_timer crono_gpu2;
+	crono_gpu2.tic();
+
 	/* Copy input array to device */
 	cudaMemcpy(d_input, h_input, (N+M) * sizeof(FLOAT), cudaMemcpyHostToDevice);
 
 	/* Copy the filter to the GPU */
 	cudaMemcpy(d_filter, h_filter, M * sizeof(FLOAT), cudaMemcpyHostToDevice);
 
-	/* check in the CPU */
-	cpu_timer crono_cpu; 
-	crono_cpu.tic();
-	conv_sec(h_input, check_output, h_filter);
-	crono_cpu.tac();
-
-	
 	dim3 block_size(512);
   	dim3 grid_size(N/block_size.x + (N % block_size.x ? 1 : 0));
 
@@ -119,12 +129,17 @@ int main(int argc, char *argv[])
 	cudaDeviceSynchronize();
 	crono_gpu.tac();
 
-	
-	printf("[M/N/ms_cpu/ms_gpu]= %d %d %lf  %lf  \n", M, N, crono_cpu.ms_elapsed, crono_gpu.ms_elapsed);
-
 	/* Copy output array to host */
 	cudaMemcpy(h_output, d_output, N * sizeof(FLOAT), cudaMemcpyDeviceToHost);
 	checkCUDAError("Memcpy output array : ");
+
+	crono_gpu2.tac();
+	//////////////////////////////////
+
+
+
+	printf("[M/N/ms_cpu/ms_gpu/ms_gpu_con_copia]= %d %d %lf  %lf %lf \n", M, N, crono_cpu.ms_elapsed, crono_gpu.ms_elapsed, crono_gpu2.ms_elapsed);
+
 
 	/* comparacion */
 	FLOAT error, maxerror;
