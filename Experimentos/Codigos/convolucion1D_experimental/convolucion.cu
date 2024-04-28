@@ -73,7 +73,7 @@ void conv_cpu(const FLOAT* input, FLOAT* output, const FLOAT* filter)
 // lanzamiento: la grilla se puede elegir independiente de N
 __global__ void conv_one_thread_per_output_element_all_global
 (const FLOAT* input, FLOAT* output, const FLOAT* filter) 
-{	  	
+{
 	  int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 	  FLOAT temp;
@@ -82,7 +82,7 @@ __global__ void conv_one_thread_per_output_element_all_global
 	  	temp=0.0;
 	  	for(int i=0;i<Nh;i++){
 	  		temp += filter[i]*input[i+j];
-	  	}	  
+	  	}
 	 	output[j]=temp;
 		j+=gridDim.x*blockDim.x;
 	  }
@@ -393,6 +393,7 @@ __global__ void multiply_complex(cufftComplex *d_f_filter,cufftComplex *d_f_inpu
 
 ////////////////////////////////////////////////////////////////
 // Para usar con CUSP
+/*
 #include <cusp/linear_operator.h>
 #include <cusp/multiply.h>
 #include <cusp/print.h>
@@ -423,6 +424,7 @@ class stencil : public cusp::linear_operator<float,cusp::device_memory>
 		//<<<N/BLOCK_SIZE,BLOCK_SIZE>>>(x_ptr, y_ptr, x_ptr);
     }
 };
+*/
 ////////////////////////////////////////////////////////////////
 
 int main(int argc, char *argv[]) 
@@ -517,13 +519,13 @@ int main(int argc, char *argv[])
 	cudaMemcpyToSymbol(d_filtro_constant,h_filter,sizeof(FLOAT)*Nh);
 	checkCUDAError("Memcpytosymbol filter array : ");
 
-    stencil STENCIL(N);
+    	//stencil STENCIL(N);
 	// use array1d_view to represent the linear array data
-    typedef typename cusp::array1d_view< thrust::device_ptr<float> > DeviceArray1dView;
+    	//typedef typename cusp::array1d_view< thrust::device_ptr<float> > DeviceArray1dView;
 	thrust::device_ptr<float> dev_ptr_input = thrust::device_pointer_cast(d_input);
 	thrust::device_ptr<float> dev_ptr_output = thrust::device_pointer_cast(d_output);
-	DeviceArray1dView cusp_input(dev_ptr_input,dev_ptr_input+N+Nh);
-	DeviceArray1dView cusp_output(dev_ptr_output,dev_ptr_output+N);
+	//DeviceArray1dView cusp_input(dev_ptr_input,dev_ptr_input+N+Nh);
+	//DeviceArray1dView cusp_output(dev_ptr_output,dev_ptr_output+N);
 
 	/* Sanity check */
 	assert(Nh <= M);
@@ -604,12 +606,12 @@ int main(int argc, char *argv[])
 		); 
 		break;
 
-		case 9:
+		/*case 9:
 		// hacerlo con un cusp...
 		printf("Convolucion con cusp: input en global, filtro en constant \n");
 	    // create a matrix-free linear operator
 	    cusp::multiply(STENCIL, cusp_input, cusp_output);
-		break;
+		break;*/
 
 		case 10:
 		printf("filtro e input en memoria global, 1 thread por operacion * \n");
@@ -630,7 +632,7 @@ int main(int argc, char *argv[])
 		break;
 
 	}
-	cudaThreadSynchronize();
+	cudaDeviceSynchronize();
 	crono.tac();
 	printf("[Nh/N/ms_cpu/ms_gpu]= %d %d %lf %lf\n", Nh, N, cronocpu.ms_elapsed, crono.ms_elapsed);
 
