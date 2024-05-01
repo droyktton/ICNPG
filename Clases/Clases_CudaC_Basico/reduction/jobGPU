@@ -22,11 +22,15 @@
 #$ -q gpushort
 #$ -l gpu=1
 #$ -l memoria_a_usar=1G
-#$ -N MatMul
+#$ -N reduccion
 #
 #cargar variables de entorno para encontrar cuda
-module load cuda/8.0.61
+#module load cuda/10.0.130
 
 #ejecutar el o los binarios con sus respectivos argumentos
-make run $1 $2
+
+N=1000000
+./reduccion $N 0
+./reduccion $N 1
+./reduccion $N 2
 

@@ -15,5 +15,5 @@ run:	all
 	./reduccion $(N) $(CASO)
 
 submit:	
-	qsub jobGPU $(N) $(CASO); watch qstat
+	qsub jobGPU; watch qstat
 

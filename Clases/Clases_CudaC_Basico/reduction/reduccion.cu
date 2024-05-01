@@ -47,28 +47,7 @@ __global__ void reduce1(int *g_idata, int *g_odata, int size){
 	}
 	__syncthreads();
    }
-   if (tid == 0) g_odata[blockIdx.x] = sdata[0];
-}
-
-// block reduction
-__global__ void reduce2(int *g_idata, int *g_odata, int size){
-
-   extern __shared__ int sdata[];
-
-   unsigned int tid = threadIdx.x;
-   unsigned int i = blockIdx.x*blockDim.x + threadIdx.x;
-   sdata[tid] = 0;
-   if(i<size)
-     sdata[tid] = g_idata[i];
-   __syncthreads();
-
-   for(unsigned int s=blockDim.x/2; s>0; s>>=1) 
-   {
-	if (tid < s) {
-		sdata[tid] += sdata[tid + s];
-	}
-	__syncthreads();
-   }
+   //thread 0 collects all the block sum
    if (tid == 0) g_odata[blockIdx.x] = sdata[0];
 }
 
@@ -99,20 +78,19 @@ int main(int argc, char **argv){
 
   gpu_timer reloj;
   cpu_timer relojcpu;
-  int sum=0,j=0;
+  int sum=0;
 
   switch(atoi(argv[2])){
 
 	case 0:	
 	reloj.tic();
-  	reduce0<<<totalBlocks, threadsPerBlock, threadsPerBlock*sizeof(int)>>>(input, size);
+  	reduce0<<<totalBlocks, threadsPerBlock>>>(input, size);
 	std::cout << "reduccion global: " << data_v_i[0] << " (dio bien?) en " << reloj.tac() << " ms" << std::endl;
 	break;
 
 	case 1:
 	reloj.tic();
   	reduce1<<<totalBlocks, threadsPerBlock, threadsPerBlock*sizeof(int)>>>(input, output, size);
-  	//reduce1<<<1, threadsPerBlock, threadsPerBlock*sizeof(int)>>>(output, input, threadsPerBlock);
 	sum=thrust::reduce(thrust::device,output,output+totalBlocks);
 	std::cout << "reduccion en bloques: " << sum << " (dio bien?) en " << reloj.tac() << " ms" << std::endl;
 	std::cout << "totalBlocks " << totalBlocks << std::endl;
