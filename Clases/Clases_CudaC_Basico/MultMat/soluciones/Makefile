@@ -3,7 +3,7 @@ APPS=multmat_solucion
 all: ${APPS}
 
 %: %.cu
-	nvcc -O2 -lcublas -DCUBLASXt -DCUBLAS -DSIMPLECPU -DSIMPLECUDA -o $@ $<
+	nvcc -O2 -lcublas -DCUBLASXt -DCUBLAS -DSIMPLECPU -DSIMPLECUDA -DSHAREDCUDA -o $@ $<
 
 clean:
 	rm -f ${APPS} *.dat

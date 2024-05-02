@@ -37,10 +37,11 @@ typedef struct {
 ////////////////////////////////////////////////////////////////////////
 // Forward declaration of the matrix multiplication kernel
 __global__ void MatMulKernel(const Matrix, const Matrix, Matrix);
+__global__ void MatMulKernelShared(const Matrix, const Matrix, Matrix);
 
 // Matrix multiplication - Host code
 // Matrix dimensions are assumed to be multiples of BLOCK_SIZE
-void MatMul(const Matrix A, const Matrix B, Matrix C)
+void MatMul(const Matrix A, const Matrix B, Matrix C, bool shared)
 {
     // Load A and B to device memory
     Matrix d_A;
@@ -65,7 +66,10 @@ void MatMul(const Matrix A, const Matrix B, Matrix C)
     // Invoke kernel
     dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
     dim3 dimGrid(B.width / dimBlock.x, A.height / dimBlock.y);
+    if(!shared)
     MatMulKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
+    else
+    MatMulKernelShared<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
 
     // Read C from device memory
     cudaMemcpy(C.elements, d_C.elements, size,
@@ -100,6 +104,47 @@ __global__ void MatMulKernel(Matrix A, Matrix B, Matrix C)
         * B.elements[e + col * B.width];
 
     C.elements[row + col * C.width] = Cvalue;
+}
+
+
+__global__ void MatMulKernelShared(Matrix A, Matrix B, Matrix C){
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+
+    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
+
+    float Cvalue = 0;
+
+    int m=A.width;
+    int k=A.height;
+    int n=B.height;
+
+    for (int t = 0; t < (k - 1) / BLOCK_SIZE + 1; ++t) {
+        if (row < m && t * BLOCK_SIZE + threadIdx.x < k) {
+            As[threadIdx.y][threadIdx.x] = A.elements[row * k + t * BLOCK_SIZE + threadIdx.x];
+        } else {
+            As[threadIdx.y][threadIdx.x] = 0;
+        }
+
+        if (col < n && t * BLOCK_SIZE + threadIdx.y < k) {
+            Bs[threadIdx.y][threadIdx.x] = B.elements[(t * BLOCK_SIZE + threadIdx.y) * n + col];
+        } else {
+            Bs[threadIdx.y][threadIdx.x] = 0;
+        }
+
+        __syncthreads();
+
+        for (int i = 0; i < BLOCK_SIZE; ++i) {
+            Cvalue += As[threadIdx.y][i] * Bs[i][threadIdx.x];
+        }
+
+        __syncthreads();
+    }
+
+    if (row < m && col < n) {
+        C.elements[row * n + col] = Cvalue;
+    }
 }
 
 
@@ -287,12 +332,21 @@ int main(int argc, char **argv)
 	#endif
 
 	#ifdef SIMPLECUDA
-	MatMul(A,B,C); //warmup
+	MatMul(A,B,C,0); //warmup
 	reloj_cpu.tic();
-	MatMul(A,B,C);
+	MatMul(A,B,C,0);
 	printf("N= %d simple_CUDA: %f ms\n",N, reloj_cpu.tac());
 	std::ofstream foutSC("Ccuda.dat");
 	print_matrix(C,foutSC);
+	#endif
+
+	#ifdef SHAREDCUDA
+	MatMul(A,B,C,1); //warmup
+	reloj_cpu.tic();
+	MatMul(A,B,C,1);
+	printf("N= %d shared_CUDA: %f ms\n",N, reloj_cpu.tac());
+	std::ofstream foutSCsh("Ccudash.dat");
+	print_matrix(C,foutSCsh);
 	#endif
 
 	#ifdef CUBLAS
