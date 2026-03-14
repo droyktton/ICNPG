@@ -326,7 +326,7 @@ int main(int argc, char **argv)
 	#ifdef SIMPLECPU
 	reloj_cpu.tic();
 	MatMulcpu(A,B,C);
-	printf("N= %d simple cpu: %f ms\n", N, reloj_cpu.tac());
+	printf("N= %d simple_cpu: %f ms\n", N, reloj_cpu.tac());
 	std::ofstream foutCPU("Ccpu.dat");
 	print_matrix(C,foutCPU);
 	#endif
