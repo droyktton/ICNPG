@@ -2,7 +2,7 @@
 #include <thrust/device_vector.h>
 #include <thrust/sort.h>
 // note: functor inherits from unary_function
-struct seno: public thrust::unary_function<float,float>
+struct seno
 {
   __host__ __device__
   float operator()(float x) const
