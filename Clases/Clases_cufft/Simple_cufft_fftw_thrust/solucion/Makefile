@@ -4,8 +4,8 @@ CUDA_LIB_PATH           =
 INCLUDES += 
 
 #parametros
-TAMANIO			= 4194304 
-PARAMETROS		= -DTAMANIO=$(TAMANIO) #-DIMPRIMIR #si imprime asegurese de que TAMANIO sea chico! 
+TAMANIO			= 4096 
+PARAMETROS		= -DTAMANIO=$(TAMANIO) -DIMPRIMIR #si imprime asegurese de que TAMANIO sea chico! 
 
 # Flags
 LIBS                    = #-L$(CUDA_LIB_PATH)
