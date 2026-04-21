@@ -1,6 +1,6 @@
 SRC=nbody.c
 EXE=nbody
-gcc -std=c99 -O3 -fopenmp -DSHMOO -o $EXE $SRC -lm
+gcc -std=c99 -O3 -fopenmp -DSHMOO -o $EXE $SRC -lm -I.
 
 echo $EXE
 
