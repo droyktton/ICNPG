@@ -1,0 +1,63 @@
+Why You're Seeing "Not Supported"
+The cudaDeviceCanAccessPeer check returns false if the hardware topology doesn't allow a direct path. This typically happens for a few reasons:
+
+
+PCIe Topology: The GPUs might be connected to different CPU sockets or different PCIe Root Complexes that don't support peer-to-peer routing.
+
+WDDM on Windows: If you are on Windows, GPUs often need to be in TCC (Tesla Compute Cluster) mode rather than WDDM mode to support P2P.
+
+
+Hardware Generation: Older or consumer-grade cards sometimes lack the specific hardware links required for P2P.
+
+
+##########################
+nvidia-smi topo -m
+
+GPU0 GPU1 GPU2 GPU3 CPU Affinity NUMA Affinity GPU NUMA ID
+
+GPU0 X NODE NODE NODE 0 0 N/A
+
+GPU1 NODE X NODE NODE 0 0 N/A
+
+GPU2 NODE NODE X NODE 1 N/A
+
+GPU3 NODE NODE NODE X 1 N/A
+
+
+
+Legend:
+
+
+
+  X    = Self
+
+  SYS  = Connection traversing PCIe as well as the SMP interconnect between NUMA nodes (e.g., QPI/UPI)
+
+  NODE = Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node
+
+  PHB  = Connection traversing PCIe as well as a PCIe Host Bridge (typically the CPU)
+
+  PXB  = Connection traversing multiple PCIe bridges (without traversing the PCIe Host Bridge)
+
+  PIX  = Connection traversing at most a single PCIe bridge
+
+  NV#  = Connection traversing a bonded set of # NVLinks
+
+#################################
+
+
+Interpreting Your Results
+In your matrix, the connection between GPU 0 and GPU 1 is labeled as NODE. According to your legend:
+
+NODE: Connection traversing PCIe as well as the interconnect between PCIe Host Bridges within a NUMA node.
+
+This means that while both GPUs are technically in the same NUMA node (Node 0), they are connected to different PCIe Host Bridges. For P2P to work over PCIe, GPUs typically need a more direct path, such as PIX (at most a single bridge) or PXB (multiple bridges without traversing the Host Bridge).
+
+Because your traffic has to traverse the interconnect between host bridges, the hardware does not support the direct routing required for Peer-to-Peer memory access.
+
+The Next Lesson: Fallback with Pinned MemorySince P2P is unavailable, the next step in teaching Multi-GPU CUDA is showing how to optimize the "Fallback" path (GPU $\rightarrow$ Host $\rightarrow$ GPU). The standard method of moving data through the CPU is slow because it uses "Pageable" host memory.To make this faster, you should teach Pinned (Page-Locked) Memory.Why Pinned Memory?Direct Memory Access (DMA): The GPU can copy data directly from Pinned Host Memory without the CPU's help, providing higher bandwidth.Asynchronous Transfers: You can only overlap data transfers with kernel execution (using CUDA Streams) if you use Pinned Memory.
+
+
+
+
+
