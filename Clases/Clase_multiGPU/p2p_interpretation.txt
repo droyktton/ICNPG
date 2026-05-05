@@ -55,7 +55,29 @@ This means that while both GPUs are technically in the same NUMA node (Node 0), 
 
 Because your traffic has to traverse the interconnect between host bridges, the hardware does not support the direct routing required for Peer-to-Peer memory access.
 
-The Next Lesson: Fallback with Pinned MemorySince P2P is unavailable, the next step in teaching Multi-GPU CUDA is showing how to optimize the "Fallback" path (GPU $\rightarrow$ Host $\rightarrow$ GPU). The standard method of moving data through the CPU is slow because it uses "Pageable" host memory.To make this faster, you should teach Pinned (Page-Locked) Memory.Why Pinned Memory?Direct Memory Access (DMA): The GPU can copy data directly from Pinned Host Memory without the CPU's help, providing higher bandwidth.Asynchronous Transfers: You can only overlap data transfers with kernel execution (using CUDA Streams) if you use Pinned Memory.
+################################
+Target Labels for P2P Support
+If your hardware is optimized for multi-GPU communication, you should see the following acronyms instead of NODE:
+
+
+NV# (e.g., NV1, NV12): This indicates a connection via NVLink, which is the gold standard. P2P is almost certainly supported and will provide significantly higher bandwidth than any PCIe-based connection.
+
+
+PIX: This stands for a connection traversing at most a single PCIe bridge. This is a very direct path that typically supports P2P.
+
+
+PXB: This indicates the connection traverses multiple PCIe bridges but does not go through the PCIe Host Bridge (CPU). This path usually supports P2P access.
+
+################################
+
+The Next Lesson: Fallback with Pinned Memory
+Since P2P is unavailable, the next step in teaching Multi-GPU CUDA is showing how to optimize the "Fallback" path (GPU $\rightarrow$ Host $\rightarrow$ GPU). 
+The standard method of moving data through the CPU is slow because it uses "Pageable" host memory. 
+To make this faster, you should teach Pinned (Page-Locked) Memory.
+
+Why Pinned Memory?
+Direct Memory Access (DMA): The GPU can copy data directly from Pinned Host Memory without the CPU's help, providing higher bandwidth.
+Asynchronous Transfers: You can only overlap data transfers with kernel execution (using CUDA Streams) if you use Pinned Memory.
 
 
 
